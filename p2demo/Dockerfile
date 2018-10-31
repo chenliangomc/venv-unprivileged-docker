@@ -9,6 +9,7 @@ RUN apt-get -y install procps psmisc mg wget dnsutils net-tools python-minimal v
 RUN adduser --uid 1000 --home /opt/vnp  vp
 
 ADD ./etc /opt/vnp/etc
+RUN chmod a+x /opt/vnp/etc/*.sh
 RUN chown -R 1000:1000 /opt/vnp/etc
 
 USER 1000
@@ -19,4 +20,4 @@ RUN mkdir -p /opt/vnp/temp
 
 RUN /opt/vnp/bin/pip install supervisor
 
-CMD /opt/vnp/bin/supervisord -c /opt/vnp/etc/supervisord.conf
+CMD /opt/vnp/etc/entry-point.sh
