@@ -8,25 +8,15 @@ RUN apt-get -y install procps psmisc mg wget dnsutils net-tools python-minimal v
 
 RUN adduser --uid 1000 --home /opt/vnp  vp
 
+ADD ./etc /opt/vnp/etc
+RUN chown -R 1000:1000 /opt/vnp/etc
+
 USER 1000
 RUN virtualenv /opt/vnp
 
 WORKDIR /opt/vnp
-RUN mkdir -p /opt/vnp/etc /opt/vnp/temp
+RUN mkdir -p /opt/vnp/temp
 
 RUN /opt/vnp/bin/pip install supervisor
-
-RUN echo "[supervisord]" > /opt/vnp/etc/supervisord.conf
-RUN echo "nodaemon=true" >> /opt/vnp/etc/supervisord.conf
-RUN echo "childlogdir=/opt/vnp/temp" >> /opt/vnp/etc/supervisord.conf
-
-RUN echo "[rpcinterface:supervisor]" >> /opt/vnp/etc/supervisord.conf
-RUN echo "supervisor.rpcinterface_factory=supervisor.rpcinterface:make_main_rpcinterface" >> /opt/vnp/etc/supervisord.conf
-
-RUN echo "[unix_http_server]" >> /opt/vnp/etc/supervisord.conf
-RUN echo "file=/opt/vnp/temp/supervisor.sock" >> /opt/vnp/etc/supervisord.conf
-
-RUN echo "[supervisorctl]" >> /opt/vnp/etc/supervisord.conf
-RUN echo "serverurl=unix:///opt/vnp/temp/supervisor.sock" >> /opt/vnp/etc/supervisord.conf
 
 CMD /opt/vnp/bin/supervisord -c /opt/vnp/etc/supervisord.conf
