@@ -38,6 +38,6 @@ RUN virtualenv /opt/vnp
 WORKDIR /opt/vnp
 RUN mkdir -p /opt/vnp/temp
 
-RUN /opt/vnp/bin/pip install supervisor
+RUN /opt/vnp/bin/pip install -r etc/pip-list.txt
 
 CMD /opt/vnp/etc/entry-point.sh
