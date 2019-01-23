@@ -19,9 +19,12 @@
 FROM debian:testing
 MAINTAINER Liang Chen "liangchenomc@gmail.com"
 
-RUN apt-get update && apt-get -y install apt-utils
+RUN DEBIAN_FRONTEND=noninteractive apt-get update && apt-get -y install apt-utils
 
-RUN apt-get -y install procps psmisc mg wget dnsutils net-tools python-minimal virtualenv
+RUN DEBIAN_FRONTEND=noninteractive apt-get -y install \
+    procps psmisc mg \
+    wget dnsutils net-tools \
+    python-minimal virtualenv
 
 RUN adduser --uid 1000 --home /opt/vnp  vp
 
