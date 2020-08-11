@@ -1,6 +1,7 @@
 #!/bin/bash
-
-#  Copyright 2018 Liang Chen <liangchenomc@gmail.com>
+# -*- sh -*-
+#
+#  Copyright 2018, 2019, 2020 Liang Chen <liangchenomc@gmail.com>
 #
 #  This file is part of venv-unprivileged-docker.
 #
@@ -18,4 +19,31 @@
 #  along with venv-unprivileged-docker.
 #  If not, see <https://www.gnu.org/licenses/>.
 
-/opt/vnp/bin/supervisord -c /opt/vnp/etc/supervisord.conf
+set +e
+
+POD_CONF=${POD_CONF-/etc/app/demo.conf}
+
+if [ -f $POD_CONF ]; then
+    source $POD_CONF
+fi
+
+if [ -n $HOME ]; then
+    if [ -d $HOME ]; then
+        # enable virtualenv on-demand;
+        if [ -f $HOME/bin/activate ]; then
+            source $HOME/bin/activate
+        fi
+
+        # start service;
+        cd $HOME ; supervisord
+    else
+        echo "[warn] env HOME does not exist"
+    fi
+else
+    echo "[warn] env HOME not set"
+fi
+
+echo "[warn] enter fail-safe mode"
+while true ; do
+    sleep 7s
+done

@@ -1,3 +1,6 @@
+#!/bin/bash
+# -*- sh -*-
+#
 #  Copyright 2018, 2019, 2020 Liang Chen <liangchenomc@gmail.com>
 #
 #  This file is part of venv-unprivileged-docker.
@@ -15,23 +18,32 @@
 #  You should have received a copy of the GNU Affero General Public License
 #  along with venv-unprivileged-docker.
 #  If not, see <https://www.gnu.org/licenses/>.
+#
+# stage1.sh -- system-level configuration
 
-FROM debian:buster
-MAINTAINER Liang Chen "liangchenomc@gmail.com"
+set -e
 
-ARG BUILD_BASE=/opt/build
-ARG IMG_UID=1000
-ARG IMG_USER=appuser
-ARG IMG_USER_HOME=/home/$IMG_USER
-ARG IMG_USER_PASS
+export DEBIAN_FRONTEND=noninteractive
 
-COPY ./build  $BUILD_BASE
+# install packages
+apt-get update -f && apt-get -y -q install apt-utils auto-apt-proxy bc
 
-RUN bash $BUILD_BASE/stage1.sh
+apt-get -y -q install \
+    procps psmisc htop mg kakoune tree rsync \
+    wget curl dnsutils net-tools openssl stunnel \
+    bzip2 git unzip zip xz-utils \
+    python-minimal python-pip-whl virtualenv
 
-USER $IMG_UID
-WORKDIR $IMG_USER_HOME
-COPY ./etc $IMG_USER_HOME/etc
-RUN bash $BUILD_BASE/stage2.sh
+# add unpriviliged user
+nulist=/tmp/.nu.txt
+rm -rf $nulist && touch $nulist
+echo "$IMG_USER:$IMG_USER_PASS:$IMG_UID:$IMG_UID:app,host:$IMG_USER_HOME:/bin/bash" > $nulist
+newusers $nulist
+rm -f $nulist
 
-ENTRYPOINT ["/bin/bash", "/opt/runtime/entry-point.sh"]
+# prepare entry-point
+mkdir -p /opt/runtime ; mv $BUILD_BASE/entrty-point.sh /opt/runtime
+
+# clean-up
+rm -f $BUILD_BASE/stage1.sh
+exit 0

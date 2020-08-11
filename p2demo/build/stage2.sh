@@ -1,3 +1,6 @@
+#!/bin/bash
+# -*- sh -*-
+#
 #  Copyright 2018, 2019, 2020 Liang Chen <liangchenomc@gmail.com>
 #
 #  This file is part of venv-unprivileged-docker.
@@ -15,23 +18,15 @@
 #  You should have received a copy of the GNU Affero General Public License
 #  along with venv-unprivileged-docker.
 #  If not, see <https://www.gnu.org/licenses/>.
+#
+# stage2.sh -- user-level configuration
 
-FROM debian:buster
-MAINTAINER Liang Chen "liangchenomc@gmail.com"
+set -e
 
-ARG BUILD_BASE=/opt/build
-ARG IMG_UID=1000
-ARG IMG_USER=appuser
-ARG IMG_USER_HOME=/home/$IMG_USER
-ARG IMG_USER_PASS
+virtualenv -p `which python` $IMG_USER_HOME
 
-COPY ./build  $BUILD_BASE
+(set -e ; source $IMG_USER_HOME/bin/activate ; pip install --no-cache -U -r $IMG_USER_HOME/etc/pip-list.txt ; deactivate; exit 0)
 
-RUN bash $BUILD_BASE/stage1.sh
+mkdir -p $IMG_USER_HOME/{etc,logs,tmp}
 
-USER $IMG_UID
-WORKDIR $IMG_USER_HOME
-COPY ./etc $IMG_USER_HOME/etc
-RUN bash $BUILD_BASE/stage2.sh
-
-ENTRYPOINT ["/bin/bash", "/opt/runtime/entry-point.sh"]
+exit 0
