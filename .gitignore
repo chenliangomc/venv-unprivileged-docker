@@ -1,0 +1,15 @@
+*~
+[0123456789]*
+*.bak
+*.buildinfo
+*.bz2
+*.changes
+changelog
+*.deb
+*.mk
+*.orig
+__pycache__
+*.py[cod]
+*.tar
+*.tbz
+*.zip
